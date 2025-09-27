@@ -16,7 +16,7 @@ const instructors = {
   chioma: "Nails Technology",
   fera: "Video Editing",
   taiwo: "Videography & Photography",
-  ezekiel: "web Design",
+  ezekiel: "Web Design",
   deji: "UI/UX Design",
   sylvester: "Computer Networking"
 };
