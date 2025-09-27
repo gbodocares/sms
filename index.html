@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      row-gap: 30px;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff);
+      color: #fff;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      width: 90%;
+      max-width: 1000px;
+      text-align: center;
+    }
+
+    .card {
+      background: #fff;
+      color: #333;
+      padding: 2rem 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .icon {
+      font-size: 40px;
+      margin-bottom: 1rem;
+      color: #004e92;
+    }
+
+    .card h2 {
+      margin-bottom: 0.5rem;
+      font-size: 22px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+   <h4 style="color: #800020;">Gbodo Cares Learning Management System</h2>
+  <div class="container">
+     
+    <a href="login.html" class="card">
+      <div class="icon">🎓</div>
+      <h2>Student</h2>
+      <p>Access your dashboard, courses, and progress.</p>
+    </a>
+
+    <a href="instructor.html" class="card">
+      <div class="icon">👨‍🏫</div>
+      <h2>Instructor</h2>
+      <p>Manage classes, assignments, and track students.</p>
+    </a>
+
+    <a href="admin.html" class="card">
+      <div class="icon">⚙️</div>
+      <h2>Administrator</h2>
+      <p>Control system settings and user management.</p>
+    </a>
+  </div>
+</body>
+</html>

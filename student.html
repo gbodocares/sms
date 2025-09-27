@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Portal</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="loader.css">
+ 
+</head>
+<body>
+
+  <div class="header">
+    <div class="logoo">
+      <img src="gbodo-logo.png" alt="gbodocareslogo" width="40px" height="40px"/>
+    </div>
+    <div class="btn">
+      <button id="logOut" onclick="logOut()">Logout</button>
+    </div>
+  </div>
+
+  <div class="cont">
+    <h1>Student Dashboard</h1>
+
+  <!-- Profile Section -->
+  <section>
+    <h2 id="hello" style="color: #800020;"></h2>
+    <div style="display: flex; justify-content: space-between;">
+       <img id="profileImage" src="" alt="Profile Photo" width="100px" height="100px" style="border: 2px solid; color: #800020; border-radius: 5px;">
+       <div id="totalScores">
+          <p id="totalScore"></p>
+       </div>
+    </div>
+   
+    <h3 id="groupName"></h3>
+    
+    <form id="profileForm">
+      <input type="text" id="profileRegNo" placeholder="Registration No" required disabled>
+      <input type="text" id="profileFullName" placeholder="Full Name" required>
+      <input type="email" id="profileEmail" placeholder="Email" required>
+      <input type="text" id="profilePhone" placeholder="Phone number" required>
+      <select id="profileDept">
+      <option value="none">---Select the Department---</option>
+      <option value="Make-up">Make-up</option>
+      <option value="Tailoring">Tailoring</option>
+      <option value="Nails Technology">Nails Technology</option>
+      <option value="Web Design">Web Design</option>
+      <option value="Computer Networking">Computer Networking</option>
+      <option value="UI/UX Design">UI/UX Design</option>
+      <option value="Video Editing">Video Editing</option>
+      <option value="Videography & Photography">Videography & Photography</option>
+    </select>
+      <button type="submit">Update Profile</button>
+    </form>
+  </section>
+
+  <!-- Scores Section -->
+  <section>
+    <h2 style="color: #800020;"><i class="bi bi-journal-text"></i> Academic Records</h2>
+    <table border="1" style="border-collapse: collapse; text-align: center; padding: 10px;"  width="100%">
+      <thead>
+        <tr style="background-color: #000; color: #fff;" >
+          <th>Attendance</th>
+          <th>Test</th>
+          <th>Assignments</th>
+          <th>Soft Skill</th>
+          <th>Final Project</th>
+        </tr>
+      </thead>
+      <tbody id="scoreTableBody" style="font-size: 13px;">
+        <tr>
+          <td id="scoreAttendance">0</td>
+          <td id="scoreTest">0</td>
+          <td id="scoreAssignment">0</td>
+          <td id="scoreSoftSkill">0</td>
+          <td id="scoreFinalProject">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Groups Section -->
+  <section>
+    <h2 style="color: #800020;"><i class="bi bi-people"></i> Soft Skill Group Members</h2>
+    <table border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+      <thead>
+        <tr  style="background-color: #000; color: #fff;">
+          <th>Reg No</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Phone Number</th>
+        </tr>
+      </thead>
+      <tbody id="groupList" style="font-size: 13px;">
+        <!-- Group members will appear here -->
+      </tbody>
+    </table>
+
+  </section>
+
+  <div id="loader" class="loader-overlay" style="display:none;">
+  <div class="spinner"></div>
+</div>
+  </div>
+  
+
+
+  <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-storage.js"></script>
+
+  <script  src="firebase-config.js"></script>
+  <script  src="student.js"></script>
+  <script>
+    firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    firebase.firestore().collection("students1").doc(user.uid).get()
+      .then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.photoURL) {
+            document.getElementById("profileImage").src = data.photoURL;
+          }
+        }
+      })
+      .catch(err => console.error("Error fetching profile:", err));
+  }
+});
+    </script>
+</body>
+</html>

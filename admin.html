@@ -1,0 +1,170 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="loader.css">
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+ 
+      const accessCode = "54321"; 
+      const userInput = prompt("Enter Administrator Access Code:");
+
+      if (userInput !== accessCode) {
+        alert("Access Denied! Redirecting to home.");
+        window.location.href = "index.html"; 
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logoo">
+      <img src="gbodo-logo.png" alt="gbodocareslogo" width="40px" height="40px"/>
+    </div>
+   <div class="btn">
+      <div>
+        <a href="index.html" style="color: #fff; text-decoration: none;"><i class="bi bi-arrow-left-short"></i> Back</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont">
+     <h1>Admin Dashboard</h1>
+
+  <h2><i class="bi bi-plus-lg" style="color: #800020;"></i> Add Student</h2>
+  <form id="addStudentForm">
+    <input type="text" id="studentRegNo" placeholder="Registration Number" required>
+    <input type="text" id="fullName" placeholder="Full Name" required>
+    <input type="email" id="studentEmail" placeholder="Email" required>
+    <input type="text" id="studentPhone" placeholder="Phone number" required>
+    <input type="password" id="studentPassword" placeholder="Password" required>
+    <select id="studentDept">
+      <option value="none">---Select the Department---</option>
+      <option value="Make-up">Make-up</option>
+      <option value="Tailoring">Tailoring</option>
+      <option value="Nails Technology">Nails Technology</option>
+      <option value="Web Design">Web Design</option>
+      <option value="Computer Networking">Computer Networking</option>
+      <option value="UI/UX Design">UI/UX Design</option>
+      <option value="Video Editing">Video Editing</option>
+      <option value="Videography & Photography">Videography & Photography</option>
+    </select>
+    <input type="file" id="profilePhoto" accept="image/*" required>
+    <button type="submit">Add Student</button>
+  </form>
+
+  <h2><i class="bi bi-pencil-square" style="color: #800020;"></i> Edit Student</h2>
+  <ul id="studentList"></ul>
+  <table border="1" style="border-collapse: collapse; text-align: center;"  width="100%">
+    <thead>
+      <tr style="background-color: #000; color: #fff;">
+        <th>Reg No</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Department</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="studentTableBodyEdit" style="font-size: 13px;"></tbody>
+  </table>
+
+  <!-- Add this below the Students List in admin.html -->
+
+    <h2><i class="bi bi-cloud-upload" style="color: #800020;"></i> Upload Student Scores</h2>
+    <form id="adminScoreForm">
+    <input type="text" id="adminStudentId" placeholder="Student ID (Firestore UID)" required>
+    <input type="number" id="adminAttendance" placeholder="Attendance" step="0.01">
+    <input type="number" id="adminTest" placeholder="Test" step="0.01">
+    <input type="number" id="adminAssignment" placeholder="Assignments" step="0.01">
+    <input type="number" id="adminSoftSkill" placeholder="Soft Skill" step="0.01">
+    <input type="number" id="adminFinalProject" placeholder="Final Project" step="0.01">
+    <button type="submit">Submit Scores</button>
+    </form>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Edit Student</h3>
+      <form id="editStudentForm">
+
+        <input type="hidden" id="editStudentId">
+
+        <label>Reg No</label>
+        <input type="text" id="editRegNo"><br>
+
+        <label>Full Name</label>
+        <input type="text" id="editFullName"><br>
+
+        <label>Email</label>
+        <input type="email" id="editEmail"><br>
+
+        <label>Phone</label>
+        <input type="text" id="editPhone"><br>
+
+        <label>Department</label>
+        <select id="editDept">
+          <option value="none">---Select the Department---</option>
+          <option value="Make-up">Make-up</option>
+          <option value="Tailoring">Tailoring</option>
+          <option value="Nails Technology">Nails Technology</option>
+          <option value="Web Design">Web Design</option>
+          <option value="Computer Networking">Computer Networking</option>
+          <option value="UI/UX Design">UI/UX Design</option>
+          <option value="Video Editing">Video Editing</option>
+          <option value="Videography & Photography">Videography & Photography</option>
+        </select>
+
+        <button id="saveEditBtn">Save Changes</button>
+      </form>
+      
+      
+    </div>
+  </div>
+
+
+  <input type="text" id="searchInput" placeholder="Search students..." />
+
+  <section id="scores-table-section">
+    <table id="studentTable" border="1" cellpadding="8" cellspacing="0"  width="100%">
+      <thead>
+        <tr style="background-color: #000; color: #fff;">
+          <th>Reg No</th>
+          <th>Photo</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Soft skill Group</th>
+          <th>Attendance</th>
+          <th>Test</th>
+          <th>Assignment</th>
+          <th>Soft Skill</th>
+          <th>Final Project</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="studentTableBody" style="font-size: 13px;"></tbody>
+    </table>
+  </section>
+
+  <div id="loader" class="loader-overlay" style="display:none;">
+  <div class="spinner"></div>
+</div>
+  </div>
+ 
+
+  <!-- firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-storage.js"></script>
+
+  <script  src="firebase-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
