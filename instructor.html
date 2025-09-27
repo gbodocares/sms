@@ -73,7 +73,7 @@
         </table>
 
       <h2><i class="bi bi-list-check" style="color: #800020;"></i> Mark Attendance</h2>
-      <form id="attendance-form">
+      <!-- <form id="attendance-form">
         <label for="studentId">Student ID:</label>
         <input type="text" id="studentId" required>
 
@@ -81,6 +81,13 @@
         <input type="date" id="date" required>
 
         <button type="submit">Submit Attendance</button>
+      </form> -->
+      <form id="attendance-form">
+        <label for="studentId">Select Student:</label>
+        <select id="studentId" required>
+          <option value="">-- Select Student --</option>
+        </select>
+        <button type="submit">Mark Attendance</button>
       </form>
       </section>
 

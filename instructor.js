@@ -29,13 +29,12 @@ function loginInstructor() {
   if (instructors[username]) {
     // show instructor panel
     instAll.style.display = "block";
-    instructorLogin.style.display = "none"
-
+    instructorLogin.style.display = "none";
 
     // get the department assigned to this instructor
     let instructorDept = instructors[username];
 
-    // load students related to this department
+    // load students related to this department into table
     firebase.firestore().collection("students1")
       .where("department", "==", instructorDept)
       .onSnapshot(snapshot => {
@@ -58,10 +57,27 @@ function loginInstructor() {
         });
       });
 
+    // ✅ also populate student <select> field for attendance
+    const studentSelect = document.getElementById("studentId");
+    db.collection("students1")
+      .where("department", "==", instructorDept)
+      .get()
+      .then(snaps => {
+        studentSelect.innerHTML = `<option value="">-- Select Student --</option>`;
+        snaps.forEach(doc => {
+          const data = doc.data();
+          const option = document.createElement("option");
+          option.value = data.regNo;
+          option.textContent = `${data.regNo} - ${data.fullName}`;
+          studentSelect.appendChild(option);
+        });
+      });
+
   } else {
     alert("Invalid username. Contact admin.");
   }
 }
+
 
 const db = firebase.firestore();
 
@@ -98,19 +114,18 @@ async function recalcTotal(studentId) {
 }
 
 
-//mark the attendance
-const studentList = document.getElementById("studentList");
-
+// mark the attendance
 document.getElementById("attendance-form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const studentSelect = document.getElementById("studentId");
 
-  const regNo = document.getElementById("studentId").value.trim();
+  const regNo = studentSelect.value.trim();
   const attendanceScore = 0.25;
 
-  if (!regNo) return alert("Reg No is required");
+  if (!regNo) return alert("Please select a student");
 
   try {
-    showLoader(); // show spinner
+    showLoader();
 
     const snapshot = await db.collection("students1")
       .where("regNo", "==", regNo)
@@ -126,22 +141,21 @@ document.getElementById("attendance-form").addEventListener("submit", async (e) 
     const docRef = doc.ref;
     const data = doc.data();
 
-    // ✅ Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0];
 
-    // Check if already submitted today
     if (data.lastAttendanceDate === today) {
       alert("⚠️ Attendance already submitted for today!");
       return;
     }
 
-    // Update attendance and set today's date
     await docRef.update({
       attendance: firebase.firestore.FieldValue.increment(attendanceScore),
-      lastAttendanceDate: today
+      lastAttendanceDate: today // save as string
     });
 
-    await recalcTotal(docRef.id);
+    if (typeof recalcTotal === "function") {
+      await recalcTotal(docRef.id);
+    }
 
     alert("✅ Attendance updated successfully!");
     document.getElementById("attendance-form").reset();
@@ -149,9 +163,10 @@ document.getElementById("attendance-form").addEventListener("submit", async (e) 
     console.error("Error updating attendance:", err);
     alert("Error updating attendance");
   } finally {
-    hideLoader(); // always hide spinner
+    hideLoader();
   }
 });
+
 
 
 
@@ -200,29 +215,5 @@ document.getElementById("scores-form").addEventListener("submit", async (e) => {
   }
 });
 
-
-
-
-
-// firebase.firestore().collection("students1").where("department", "==", instructorDept).onSnapshot(snapshot => {
-//   const tableBody = document.getElementById("studentTableBody");
-//   tableBody.innerHTML = ""; // Clear existing rows
-
-//   snapshot.forEach(doc => {
-//     const data = doc.data();
-//     const row = document.createElement("tr");
-
-//     row.innerHTML = `
-//       <td>${data.regNo || ""}</td>
-//       <td><img width="200px" height="200px" src=${data.photoURL || ""} alt="" /></td>
-//       <td>${data.fullName || ""}</td>
-//       <td>${data.attendance || ""}</td>
-//       <td>${data.test || ""}</td>
-//       <td>${data.assignment || ""}</td>
-//     `;
-
-//     tableBody.appendChild(row);
-//   });
-// });
 
 
