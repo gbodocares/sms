@@ -14,62 +14,12 @@ const registerForm = document.getElementById("registerForm");
 
 
 const groups = ["Alpha", "Beta", "Charlie", "Delta", "Echo", "Fox", "Gamma", "Hive", "Intel", "Justice"];
+const ssGroups = ["CLASS 1", "CLASS 2", "CLASS 3"];
 
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
-
-    // const studentsRegNo = {
-    //   "Tailoring": [
-    //     "284 - IGWE NKIRU", "777 - OLADELE OMOTOLA", "248 - DAVID MIRACLE", 
-    //     "454 - LAWAL MAZEEDAH", "472 - IGBEBINA SAMSON", "206 - MUNTEKIYAT MURITALA",
-    //     "442 - NNADI CHIDINMA", "964 - UMAR RAFAT", "773 - IDRIS PELUMI", 
-    //     "327 - JIMOH KHALIDAT", "386 - IZUGBUNAM ADANNA", "381 - ODEYEMI JESSE", 
-    //     "799 - YUSUF ASMAU", "112 - AKINDE TITLAYO", "517 - IBRAHIM WOSILAT", 
-    //     "718 - IDRIS OMOLARA", "985 - OLOJEDE ZAINAB", "307 - ONYEJEKWE JULIET"
-    //   ],
-
-    //   "Make-up": [
-    //     "760 - ASQUO BASSEY EDISUA", "541 - UDEEGWU CLAUDIA", 
-    //     "626 - MICHEAL FAVOUR", "015 - OYENIYI HAJARAT",
-    //     "065 - ABUBAKAR MERCY"
-    //   ],
-
-    //   "Nails Technology": [
-    //     "710 - UNEGBU PANELA", "135 - ALADE OLUWAPELUMI", "512 - ADEWOLE FATIA", "470 - OSOFISAN AYOBAMI", 
-    //     "444 - OLADEJO AYOMIDE", "909 - IYANDA MARIAM", "808 - OLOWU ADERONKE", "008 - OGUNGBEMI OLUWABUKOLA", 
-    //     "500 - OLUWATUYI AYOMIDE", "743 - PAM DORCAS", "581 - NDUBUAKWU RAPHAEL", "527 - AMONILOJU FAREEDAH", 
-    //     "054 - GADE VICTORIA", "458 - ISHOLA BOLUWATIFE", "667 - OSHO OMOGBONJUBOLA", "747 - SAMUEL ESTHER", 
-    //     "786 - DAVID PROSPER", "535 - AHMED TAOFEEKAT", "342 - BARUWA SAMIAT", "786 - UDOCHI JOY", "847 - OSENI ALIYAH"
-    //   ],
-
-    //   "Videography & Photography": [
-    //     "989 - OGUNJIMI ELIJAH", "685 - BERNARD EZEKIEL", "770 - SOSANYA KHADIJAT", "804 - OKO EMMANUEL", "886 - BELLO FRIDAUS", "368 - KAWOJUE FAWAZ", "942 - SULAIMON MARIAM", "798 - BERNAD VICTOR",
-    //     "", "", "", "","", "", "", "",
-    //   ],
-
-    //   "Video Editing": [
-    //     "", "", "", "","", "", "", "",
-    //     "", "", "", "","", "", "", "",
-    //   ],
-
-    //   "Computer Networking": [
-    //     "", "", "", "","", "", "", "",
-    //     "", "", "", "","", "", "", "",
-    //   ],
-
-    //   "Web Design": [
-    //     "", "", "", "","", "", "", "",
-    //     "", "", "", "","", "", "", "",
-    //   ],
-
-    //   "UI/UX Design": [
-    //     "", "", "", "","", "", "", "",
-    //     "", "", "", "","", "", "", "",
-    //   ],
-
-    // }; 
     let departmentSelect = document.getElementById("dept");
     let regNoSelect = document.getElementById("regNo");
 
@@ -144,7 +94,7 @@ registerForm.addEventListener("submit", async (e) => {
       .get();
 
     if (!regNoSnap.empty) {
-      alert("This Registration Number has already been used. Please use your unique reg No.");
+      alert("This Registration Number has already been used. Please use your unique reg No. or See the Admin");
       return;
     }
 
@@ -158,6 +108,25 @@ registerForm.addEventListener("submit", async (e) => {
     // Get download URL
     const photoURL = await storageRef.getDownloadURL();
 
+    //🔹 Step 1: Assign Class (max 40 per class)
+    const shuffledClasses = shuffle([...ssGroups]);
+    let assignedClass = null;
+    for (let c of shuffledClasses) {
+      const snap = await firebase.firestore()
+        .collection("students1")
+        .where("classId", "==", c)
+        .get();
+
+      if (snap.size < 40) {
+        assignedClass = c;
+        break;
+      }
+    }
+    if (!assignedClass) {
+      alert("All Soft Skill classes are full! Cannot assign student.");
+      return;
+    }
+
     // Shuffle and assign group
     const shuffledGroups = shuffle([...groups]);
     let assignedGroup = null;
@@ -170,7 +139,7 @@ registerForm.addEventListener("submit", async (e) => {
     }
 
     if (!assignedGroup) {
-      alert("All groups are full! Cannot assign student.");
+      alert("All soft skill groups are full! Cannot assign student.");
       return;
     }
 
@@ -181,6 +150,7 @@ registerForm.addEventListener("submit", async (e) => {
       email: email,
       department: dept,
       groupId: assignedGroup,
+      classId: assignedClass,
       phone: phone,
       photoURL: photoURL,
       createdAt: new Date(),
@@ -193,7 +163,7 @@ registerForm.addEventListener("submit", async (e) => {
       totalScore: 0
     });
 
-    alert(`Successfully registered and assigned to the soft skill group: ${assignedGroup}`);
+    alert(`Successfully registered and assigned to the soft skill group and class: Group ${assignedGroup} and ${assignedClass}`);
     window.location.href = "student.html";
     registerForm.reset();
 

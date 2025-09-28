@@ -25,7 +25,9 @@ firebase.auth().onAuthStateChanged(user => {
       document.getElementById("profilePhone").value = data.phone || "";
       document.getElementById("profileDept").value = data.department || "";
       document.getElementById("totalScore").innerHTML =  `<i class="bi bi-graph-up" style="font-size: 20px; "></i> ${data.totalScore.toFixed(2) || 0}`;
-      document.getElementById("groupName").innerHTML = `<i class="bi bi-people" style="color: #800020;"></i> Soft Skill Group : <b style="color: #800020;">${data.groupId || ""}</b>`;
+      document.getElementById("groupName").innerHTML = `<i class="bi bi-people" style="color: #800020; font-size:14px;"></i>  <b style="color: #800020; font-size:14px;">Soft Skill Group : ${data.groupId || ""}</b>`;
+      document.getElementById("ssClassName").innerHTML = `<i class="bi bi-diagram-3" style="color: #800020; font-size:14px;"></i> <b style="color: #800020; font-size:14px;">Soft Skill Class : ${data.classId || ""}</b>`;
+      welcomeText.innerHTML = `Hello, ${data.fullName}`;
       welcomeText.innerHTML = `Hello, ${data.fullName}`;
     }
   });
