@@ -13,9 +13,9 @@ let instructorDept = document.getElementById('instructorDept').value;
 const instructors = {
   daprince: "Tailoring",
   enywealth: "Make-up",
-  chioma: "Nails Technology",
+  chioma: "Nails Decoration",
   fera: "Video Editing",
-  taiwo: "Videography & Photography",
+  taiwo: "Videography",
   ezekiel: "Web Design",
   deji: "UI/UX Design",
   sylvester: "Computer Networking"
