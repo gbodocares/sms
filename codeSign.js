@@ -25,7 +25,7 @@ async function getCode() {
 
     if (docSnap.exists()) {
       const accessCode = docSnap.data().code;
-      console.log("Retrieved code:", accessCode);
+    //   console.log("Retrieved code:", accessCode);
 
       const userInput = prompt("Enter Instructor Access Code:");
 
