@@ -75,6 +75,7 @@ addForm.addEventListener("submit", async (e) => {
   }
 });
 
+
 const db = firebase.firestore();
 const tableBody = document.getElementById("studentTableBodyEdit");
 const editModal = document.getElementById("editModal");
@@ -123,6 +124,21 @@ db.collection("students1").onSnapshot(snapshot => {
     };
 
     tableBody.appendChild(row);
+  });
+
+   // Run filtering whenever the user types
+  searchInput.addEventListener("keyup", function() {
+    const filter = searchInput.value.toLowerCase();
+    const rows = tableBody.getElementsByTagName("tr");
+
+    Array.from(rows).forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(filter)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
   });
 });
 
