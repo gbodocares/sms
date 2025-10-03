@@ -76,6 +76,9 @@ addForm.addEventListener("submit", async (e) => {
 });
 
 
+
+
+
 const db = firebase.firestore();
 const tableBody = document.getElementById("studentTableBodyEdit");
 const editModal = document.getElementById("editModal");
