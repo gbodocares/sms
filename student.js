@@ -121,7 +121,7 @@ firebase.auth().onAuthStateChanged(user => {
         const data = doc.data();
 
         // Assign classId from student's profile
-        const classId = data.classId;
+        const currentDepartment = data.department;
 
         document.getElementById("profileRegNo").value = data.regNo || "";
         document.getElementById("profileFullName").value = data.fullName || "";
@@ -136,7 +136,7 @@ firebase.auth().onAuthStateChanged(user => {
         // ✅ Load classmates ranking AFTER we have classId
         if (classId) {
           firebase.firestore().collection("students1")
-            .where("classId", "==", classId)
+            .where("classId", "==", currentDepartment)
             .orderBy("totalScore", "desc")
             .get()
             .then(snaps => {
