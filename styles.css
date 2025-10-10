@@ -120,3 +120,22 @@ button:hover {
   font-size: 20px;
   font-weight: bold;
 }
+
+#classmatesTable tr td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+#classmatesTable tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+#classmatesTable tr:hover {
+  background-color: #eef9ff;
+  transition: 0.3s ease;
+}
+
+#classmatesTable td:first-child {
+  font-weight: bold;
+}
+

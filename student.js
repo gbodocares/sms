@@ -114,30 +114,64 @@ firebase.auth().onAuthStateChanged(user => {
           });
       }
     }
+
+     // Display classmates with ranking and highlight current student
+      if (classId) {
+        firebase.firestore().collection("students1")
+          .where("classId", "==", classId)
+          .orderBy("totalScore", "desc")
+          .get()
+          .then(snaps => {
+            const tableBody = document.getElementById("classmatesTable");
+            tableBody.innerHTML = "";
+
+            let position = 1;
+            snaps.forEach(docSnap => {
+              const d = docSnap.data();
+              const tr = document.createElement("tr");
+
+              // Determine position color and icon
+              let color = "";
+              let icon = "";
+              if (position === 1) {
+                color = "background-color: gold; font-weight: bold; color: #000;";
+                icon = "👑";
+              } else if (position === 2) {
+                color = "background-color: silver; font-weight: bold; color: #000;";
+                icon = "🥈";
+              } else if (position === 3) {
+                color = "background-color: #cd7f32; font-weight: bold; color: #fff;";
+                icon = "🏅";
+              }
+
+              // Highlight logged-in student's row
+              let highlight = "";
+              if (docSnap.id === user.uid) {
+                highlight = "background-color: #d4edda; font-weight: bold;";
+              }
+
+              tr.innerHTML = `
+                <td style="${color}">${position}</td>
+                <td>${d.regNo || ""}</td>
+                <td>${icon} ${d.fullName || ""}</td>
+                <td>${d.department || ""}</td>
+                <td>${(d.totalScore || 0).toFixed(2)}</td>
+              `;
+
+              tr.setAttribute("style", highlight);
+              tableBody.appendChild(tr);
+              position++;
+            });
+          })
+          .catch(err => console.error("Error loading classmates:", err));
+      }
+
+
   })
   });
 
 
-  // Load Group Members
-//   studentRef.get().then(doc => {
-//     if (doc.exists) {
-//       const groupId = doc.data().groupId;
-//       if (groupId) {
-//         firebase.firestore().collection("students1").where("groupId", "==", groupId).get().then(snaps => {
-//           const list = document.getElementById("groupList");
-//           list.innerHTML = "";
-//           snaps.forEach(m => {
-//             if (m.id !== user.uid) { // exclude self
-//               const li = document.createElement("li");
-//               li.textContent = `${m.data().regNo} - ${m.data().fullName} ${m.data().department}`;
-//               list.appendChild(li);
-//             }
-//           });
-//         });
-//       }
-//     }
-//   });
-// });
+
 
 function logOut() {
   // Show loader
