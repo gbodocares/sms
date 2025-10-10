@@ -115,7 +115,7 @@ firebase.auth().onAuthStateChanged(user => {
       }
     }
 
-     // Display classmates with ranking and highlight current student
+     // Display classmates with ranking and highlight current student + summary
       if (classId) {
         firebase.firestore().collection("students1")
           .where("classId", "==", classId)
@@ -123,9 +123,14 @@ firebase.auth().onAuthStateChanged(user => {
           .get()
           .then(snaps => {
             const tableBody = document.getElementById("classmatesTable");
+            const summaryBox = document.getElementById("rankingSummary");
             tableBody.innerHTML = "";
 
             let position = 1;
+            let totalStudents = snaps.size;
+            let currentRank = null;
+            let currentTotalScore = null;
+
             snaps.forEach(docSnap => {
               const d = docSnap.data();
               const tr = document.createElement("tr");
@@ -144,10 +149,12 @@ firebase.auth().onAuthStateChanged(user => {
                 icon = "🏅";
               }
 
-              // Highlight logged-in student's row
+              // Highlight logged-in student and track their position
               let highlight = "";
               if (docSnap.id === user.uid) {
                 highlight = "background-color: #d4edda; font-weight: bold;";
+                currentRank = position;
+                currentTotalScore = d.totalScore || 0;
               }
 
               tr.innerHTML = `
@@ -162,9 +169,27 @@ firebase.auth().onAuthStateChanged(user => {
               tableBody.appendChild(tr);
               position++;
             });
+
+            // Update summary box
+            if (currentRank) {
+              summaryBox.innerHTML = `
+                <div style="background:#f1f1f1; padding:15px; border-radius:10px; text-align:center; margin-bottom:15px;">
+                  <h3 style="color:#800020; font-weight:bold;">🎯 Your Class Ranking</h3>
+                  <p style="font-size:16px;">You are currently <b>#${currentRank}</b> out of <b>${totalStudents}</b> students.</p>
+                  <p style="font-size:14px;">Total Score: <b>${currentTotalScore.toFixed(2)}</b></p>
+                </div>
+              `;
+            } else {
+              summaryBox.innerHTML = `
+                <div style="background:#ffeaea; padding:15px; border-radius:10px; text-align:center; color:#800;">
+                  <p>Ranking data not found. Please check with your instructor.</p>
+                </div>
+              `;
+            }
           })
           .catch(err => console.error("Error loading classmates:", err));
       }
+
 
 
   })
