@@ -126,6 +126,10 @@ button:hover {
   text-align: center;
 }
 
+#rankingSummary div {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 #classmatesTable tr:nth-child(even) {
   background-color: #fafafa;
 }
