@@ -114,8 +114,9 @@ firebase.auth().onAuthStateChanged(user => {
           });
       }
     }
+  })
 
-     studentRef.get().then(doc => {
+  studentRef.get().then(doc => {
       if (doc.exists) {
         const data = doc.data();
 
@@ -205,10 +206,6 @@ firebase.auth().onAuthStateChanged(user => {
         }
       }
     });
-
-
-
-  })
   });
 
 
