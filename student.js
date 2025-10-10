@@ -136,7 +136,7 @@ firebase.auth().onAuthStateChanged(user => {
         // ✅ Load classmates ranking AFTER we have classId
         if (classId) {
           firebase.firestore().collection("students1")
-            .where("classId", "==", currentDepartment)
+            .where("department", "==", currentDepartment)
             .orderBy("totalScore", "desc")
             .get()
             .then(snaps => {
