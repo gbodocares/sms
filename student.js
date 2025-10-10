@@ -34,37 +34,37 @@ firebase.auth().onAuthStateChanged(user => {
 
   // Update Profile
   document.getElementById("profileForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const loader = document.getElementById("loader");
-  const submitBtn = document.querySelector("#profileForm button[type='submit']");
+    const loader = document.getElementById("loader");
+    const submitBtn = document.querySelector("#profileForm button[type='submit']");
 
-  // Show loader + disable button
-  loader.classList.add("active");
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Updating...";
+    // Show loader + disable button
+    loader.classList.add("active");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Updating...";
 
-  studentRef.update({
-    regNo: document.getElementById("profileRegNo").value,
-    fullName: document.getElementById("profileFullName").value,
-    email: document.getElementById("profileEmail").value,
-    phone: document.getElementById("profilePhone").value,
-    department: document.getElementById("profileDept").value
-  })
-  .then(() => {
-    alert("✅ Profile updated!");
-  })
-  .catch((err) => {
-    console.error("Error updating profile:", err);
-    alert("❌ Error updating profile");
-  })
-  .finally(() => {
-    // Hide loader + re-enable button
-    loader.classList.remove("active");
-    submitBtn.disabled = false;
-    submitBtn.innerText = "Update Profile";
+    studentRef.update({
+      regNo: document.getElementById("profileRegNo").value,
+      fullName: document.getElementById("profileFullName").value,
+      email: document.getElementById("profileEmail").value,
+      phone: document.getElementById("profilePhone").value,
+      department: document.getElementById("profileDept").value
+    })
+    .then(() => {
+      alert("✅ Profile updated!");
+    })
+    .catch((err) => {
+      console.error("Error updating profile:", err);
+      alert("❌ Error updating profile");
+    })
+    .finally(() => {
+      // Hide loader + re-enable button
+      loader.classList.remove("active");
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Update Profile";
+    });
   });
-});
 
 
   const studentId = user.uid; // use UID as document ID
@@ -206,7 +206,8 @@ firebase.auth().onAuthStateChanged(user => {
         }
       }
     });
-  });
+
+});
 
 
 
