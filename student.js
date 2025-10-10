@@ -115,80 +115,96 @@ firebase.auth().onAuthStateChanged(user => {
       }
     }
 
-     // Display classmates with ranking and highlight current student + summary
-      if (classId) {
-        firebase.firestore().collection("students1")
-          .where("classId", "==", classId)
-          .orderBy("totalScore", "desc")
-          .get()
-          .then(snaps => {
-            const tableBody = document.getElementById("classmatesTable");
-            const summaryBox = document.getElementById("rankingSummary");
-            tableBody.innerHTML = "";
+     studentRef.get().then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
 
-            let position = 1;
-            let totalStudents = snaps.size;
-            let currentRank = null;
-            let currentTotalScore = null;
+        // Assign classId from student's profile
+        const classId = data.classId;
 
-            snaps.forEach(docSnap => {
-              const d = docSnap.data();
-              const tr = document.createElement("tr");
+        document.getElementById("profileRegNo").value = data.regNo || "";
+        document.getElementById("profileFullName").value = data.fullName || "";
+        document.getElementById("profileEmail").value = data.email || "";
+        document.getElementById("profilePhone").value = data.phone || "";
+        document.getElementById("profileDept").value = data.department || "";
+        document.getElementById("totalScore").innerHTML = `<i class="bi bi-graph-up"></i> ${data.totalScore?.toFixed(2) || 0}`;
+        document.getElementById("groupName").innerHTML = `<i class="bi bi-people"></i> <b>Soft Skill Group: ${data.groupId || ""}</b>`;
+        document.getElementById("ssClassName").innerHTML = `<i class="bi bi-diagram-3"></i> <b>Soft Skill Class: ${data.classId || ""}</b>`;
+        welcomeText.innerHTML = `Hello, ${data.fullName}`;
 
-              // Determine position color and icon
-              let color = "";
-              let icon = "";
-              if (position === 1) {
-                color = "background-color: gold; font-weight: bold; color: #000;";
-                icon = "👑";
-              } else if (position === 2) {
-                color = "background-color: silver; font-weight: bold; color: #000;";
-                icon = "🥈";
-              } else if (position === 3) {
-                color = "background-color: #cd7f32; font-weight: bold; color: #fff;";
-                icon = "🏅";
+        // ✅ Load classmates ranking AFTER we have classId
+        if (classId) {
+          firebase.firestore().collection("students1")
+            .where("classId", "==", classId)
+            .orderBy("totalScore", "desc")
+            .get()
+            .then(snaps => {
+              const tableBody = document.getElementById("classmatesTable");
+              const summaryBox = document.getElementById("rankingSummary");
+              tableBody.innerHTML = "";
+
+              let position = 1;
+              let totalStudents = snaps.size;
+              let currentRank = null;
+              let currentTotalScore = null;
+
+              snaps.forEach(docSnap => {
+                const d = docSnap.data();
+                const tr = document.createElement("tr");
+
+                let color = "";
+                let icon = "";
+                if (position === 1) {
+                  color = "background-color: gold; font-weight: bold; color: #000;";
+                  icon = "👑";
+                } else if (position === 2) {
+                  color = "background-color: silver; font-weight: bold; color: #000;";
+                  icon = "🥈";
+                } else if (position === 3) {
+                  color = "background-color: #cd7f32; font-weight: bold; color: #fff;";
+                  icon = "🏅";
+                }
+
+                let highlight = "";
+                if (docSnap.id === user.uid) {
+                  highlight = "background-color: #d4edda; font-weight: bold;";
+                  currentRank = position;
+                  currentTotalScore = d.totalScore || 0;
+                }
+
+                tr.innerHTML = `
+                  <td style="${color}">${position}</td>
+                  <td>${d.regNo || ""}</td>
+                  <td>${icon} ${d.fullName || ""}</td>
+                  <td>${d.department || ""}</td>
+                  <td>${(d.totalScore || 0).toFixed(2)}</td>
+                `;
+
+                tr.setAttribute("style", highlight);
+                tableBody.appendChild(tr);
+                position++;
+              });
+
+              if (currentRank) {
+                summaryBox.innerHTML = `
+                  <div style="background:#f1f1f1; padding:15px; border-radius:10px; text-align:center; margin-bottom:15px;">
+                    <h3 style="color:#800020; font-weight:bold;">🎯 Your Class Ranking</h3>
+                    <p>You are currently <b>#${currentRank}</b> out of <b>${totalStudents}</b> students.</p>
+                    <p>Total Score: <b>${currentTotalScore.toFixed(2)}</b></p>
+                  </div>
+                `;
+              } else {
+                summaryBox.innerHTML = `
+                  <div style="background:#ffeaea; padding:15px; border-radius:10px; text-align:center; color:#800;">
+                    <p>Ranking data not found. Please check with your instructor.</p>
+                  </div>
+                `;
               }
-
-              // Highlight logged-in student and track their position
-              let highlight = "";
-              if (docSnap.id === user.uid) {
-                highlight = "background-color: #d4edda; font-weight: bold;";
-                currentRank = position;
-                currentTotalScore = d.totalScore || 0;
-              }
-
-              tr.innerHTML = `
-                <td style="${color}">${position}</td>
-                <td>${d.regNo || ""}</td>
-                <td>${icon} ${d.fullName || ""}</td>
-                <td>${d.department || ""}</td>
-                <td>${(d.totalScore || 0).toFixed(2)}</td>
-              `;
-
-              tr.setAttribute("style", highlight);
-              tableBody.appendChild(tr);
-              position++;
-            });
-
-            // Update summary box
-            if (currentRank) {
-              summaryBox.innerHTML = `
-                <div style="background:#f1f1f1; padding:15px; border-radius:10px; text-align:center; margin-bottom:15px;">
-                  <h3 style="color:#800020; font-weight:bold;">🎯 Your Class Ranking</h3>
-                  <p style="font-size:16px;">You are currently <b>#${currentRank}</b> out of <b>${totalStudents}</b> students.</p>
-                  <p style="font-size:14px;">Total Score: <b>${currentTotalScore.toFixed(2)}</b></p>
-                </div>
-              `;
-            } else {
-              summaryBox.innerHTML = `
-                <div style="background:#ffeaea; padding:15px; border-radius:10px; text-align:center; color:#800;">
-                  <p>Ranking data not found. Please check with your instructor.</p>
-                </div>
-              `;
-            }
-          })
-          .catch(err => console.error("Error loading classmates:", err));
+            })
+            .catch(err => console.error("Error loading classmates:", err));
+        }
       }
+    });
 
 
 
