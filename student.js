@@ -134,7 +134,7 @@ firebase.auth().onAuthStateChanged(user => {
         welcomeText.innerHTML = `Hello, ${data.fullName}`;
 
         // ✅ Load classmates ranking AFTER we have classId
-        if (classId) {
+        if (currentDepartment) {
           firebase.firestore().collection("students1")
             .where("department", "==", currentDepartment)
             .orderBy("totalScore", "desc")
