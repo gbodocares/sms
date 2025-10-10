@@ -123,7 +123,7 @@ button:hover {
 
 #classmatesTable tr td {
   vertical-align: middle;
-  text-align: center;
+  text-align: left;
 }
 
 #rankingSummary div {

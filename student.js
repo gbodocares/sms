@@ -175,9 +175,8 @@ firebase.auth().onAuthStateChanged(user => {
 
                 tr.innerHTML = `
                   <td style="${color}">${position}</td>
-                  <td>${d.regNo || ""}</td>
-                  <td>${icon} ${d.fullName || ""}</td>
-                  <td>${d.department || ""}</td>
+                  <td>${d.regNo || "" }</td>
+                  <td>${icon} ${d.fullName || "" }</td>
                   <td>${(d.totalScore || 0).toFixed(2)}</td>
                 `;
 
@@ -190,7 +189,7 @@ firebase.auth().onAuthStateChanged(user => {
                 summaryBox.innerHTML = `
                   <div style="background:#f1f1f1; padding:15px; border-radius:10px; text-align:center; margin-bottom:15px;">
                     <h3 style="color:#800020; font-weight:bold;">🎯 Your Class Ranking</h3>
-                    <p>You are currently <b>#${currentRank}</b> out of <b>${totalStudents}</b> students.</p>
+                    <p>You are currently <b>Ranked #${currentRank}</b> out of <b>${totalStudents}</b> students.</p>
                     <p>Total Score: <b>${currentTotalScore.toFixed(2)}</b></p>
                   </div>
                 `;
