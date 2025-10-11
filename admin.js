@@ -357,6 +357,7 @@ function renderDepartmentRankings(students) {
               </button>
             </div>
 
+             <div class="table-containerx">
             <table border="1" cellpadding="8" cellspacing="0" width="100%"
               style="border-collapse:collapse; text-align:left; margin-top:10px;">
               <thead style="background-color:#f4f4f4;">
@@ -382,6 +383,7 @@ function renderDepartmentRankings(students) {
                   .join("")}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>

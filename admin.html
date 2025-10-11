@@ -65,25 +65,28 @@
   <h4><i class="bi bi-pencil-square" style="color: #800020;"></i> Edit Student</h4>
   <!-- <ul id="studentList"></ul> -->
    <input type="text" id="searchInput" placeholder="Search students..." />
-  <table border="1" style="border-collapse: collapse; text-align: center;"  width="100%">
-    <thead>
-      <tr style="background-color: #000; color: #fff;  border:1px solid black !important;">
-          <th>Reg No</th>
-          <th>Photo</th>
-          <th>Full Name</th>
-          <th>Department</th>
-          <th>Soft skill Group</th>
-          <th>Attendance</th>
-          <th>Assignment</th>
-          <th>Test</th>
-          <th>Soft Skill</th>
-          <th>Final Project</th>
-          <th>Total</th>
-          <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="studentTableBodyEdit" style="font-size: 13px;"></tbody>
-  </table>
+   <div class="table-containerx">
+      <table border="1" style="border-collapse: collapse; text-align: center;"  width="100%">
+        <thead>
+          <tr style="background-color: #000; color: #fff;  border:1px solid black !important;">
+              <th>Reg No</th>
+              <th>Photo</th>
+              <th>Full Name</th>
+              <th>Department</th>
+              <th>Soft skill Group</th>
+              <th>Attendance</th>
+              <th>Assignment</th>
+              <th>Test</th>
+              <th>Soft Skill</th>
+              <th>Final Project</th>
+              <th>Total</th>
+              <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="studentTableBodyEdit" style="font-size: 13px;"></tbody>
+      </table>
+   </div>
+  
 
   <!-- Add this below the Students List in admin.html -->
 
@@ -145,9 +148,12 @@
 
   <section id="departmentRankingsSection" style="margin-top: 40px;">
     <h4 style="color: teal; margin-bottom: 10px;"><i class="bi bi-bar-chart-line-fill"  style="color: #800020;"></i> Department Rankings</h4>
-    <div id="rankingTablesContainer">
-      <!-- Department tables will appear here -->
-    </div>
+    
+      <div id="rankingTablesContainer">
+        <!-- Department tables will appear here -->
+      </div>
+
+    
   </section>
 
   <div id="loader" class="loader-overlay" style="display:none;">

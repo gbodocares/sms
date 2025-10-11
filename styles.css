@@ -147,3 +147,17 @@ button:hover {
   color: #fff;
 }
 
+
+.table-containerx {
+  width: 100%;
+  overflow-x: auto;  /* allows horizontal scroll */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
+  box-shadow: 0 0 5px rgba(0,0,0,0.1); /* optional: subtle shadow */
+}
+
+.table-containerx table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px; /* ensures it can scroll if table too wide */
+}
+
