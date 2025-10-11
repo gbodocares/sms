@@ -42,23 +42,31 @@
     <button onclick="loginInstructor()">Login</button>
    </section>
 
+
+
    <div id="instAll" style="display: none;">
       <section id="attendance-section">
-        <h2><i class="bi bi-people" style="color: #800020;"></i> Students in Your Class</h2>
-        <table border="1" style="border-collapse: collapse; text-align: center;" width="100%">
-          <thead>
-            <tr style="background-color: #000; color: #fff;">
+        <h1><i class="bi bi-bar-chart-line-fill"  style="color: #800020;"></i> Class Rankings</h1>
+        <p id="topStudent" style="font-weight:bold; color:#2b7a0b; margin:15px 0; font-size:16px;"></p>
+
+        <table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse:collapse; text-align:center;">
+          <thead style="background:#f5f5f5; font-weight:bold;">
+            <tr>
+              <th>Rank</th>
               <th>Reg No</th>
               <th>Photo</th>
-              <th>Name</th>
+              <th>Full Name</th>
               <th>Attendance</th>
               <th>Assignment</th>
               <th>Test</th>
-              <th>Total</th>
+              <th>S.Skill</th>
+              <th>F.Project</th>
+              <th>Total Score</th>
             </tr>
           </thead>
-          <tbody id="studentTableBody" style="font-size: 13px;" ></tbody>
+          <tbody id="studentTableBody"></tbody>
         </table>
+
 
       <h2><i class="bi bi-list-check" style="color: #800020;"></i> Mark Attendance</h2>
       <!-- <form id="attendance-form">
@@ -94,6 +102,8 @@
             <button type="submit">Submit Scores</button>
           </form>
         </section>
+
+      
 
        
    </div>
