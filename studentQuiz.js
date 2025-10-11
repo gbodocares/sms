@@ -60,112 +60,121 @@ async function recalcTotal(studentId) {
   }
 }
 
-// 📋 Load only active and available quiz
-// async function loadActiveQuiz() {
-//   try {
-//     const now = new Date();
-//     const snapshot = await db.collection('quizzes')
-//       .where('active', '==', true)
-//       .get();
-
-//     if (snapshot.empty) {
-//       quizContainer.innerHTML = '<p>No Assignment available for now.</p>';
-//       return;
-//     }
-
-//     const activeQuiz = snapshot.docs.find((doc) => {
-//       const q = doc.data();
-//       const start = q.startAt ? q.startAt.toDate() : null;
-//       const end = q.endAt ? q.endAt.toDate() : null;
-//       return (!start || now >= start) && (!end || now <= end);
-//     });
-
-//     if (!activeQuiz) {
-//       quizContainer.innerHTML = '<p>No quiz available for now.</p>';
-//       return;
-//     }
-
-//     quizData = activeQuiz.data();
-//     quizData.id = activeQuiz.id;
-
-//     // Randomize question order and options
-//     quizData.questions.sort(() => Math.random() - 0.5);
-//     quizData.questions.forEach(q => q.options.sort(() => Math.random() - 0.5));
-
-//     current = 0;
-//     score = 0;
-
-//     showQuestion();
-//     startTimer(quizData.duration * 60);
-
-//   } catch (error) {
-//     console.error("Error loading quiz:", error);
-//     quizContainer.innerHTML = `<p>Error loading quiz. Please refresh.</p>`;
-//   }
-// }
 
 async function loadActiveQuiz() {
   try {
     const now = new Date();
+
+    // 🔹 Fetch the student's department
+    const studentSnap = await studentRef.get();
+    if (!studentSnap.exists) {
+      alert("Student record not found.");
+      return;
+    }
+    const studentDept = studentSnap.data().department;
+
+    // 🔹 Fetch all active quizzes
     const snapshot = await db.collection('quizzes')
       .where('active', '==', true)
       .get();
 
     if (snapshot.empty) {
-      quizContainer.innerHTML = '<p>No Assignment available for now.</p>';
+      quizContainer.innerHTML = '<p>No active quizzes available at the moment.</p>';
       return;
     }
 
-    const activeQuiz = snapshot.docs.find((doc) => {
-      const q = doc.data();
-      const start = q.startAt ? q.startAt.toDate() : null;
-      const end = q.endAt ? q.endAt.toDate() : null;
-      return (!start || now >= start) && (!end || now <= end);
+    // 🔹 Filter all valid quizzes for this student
+    const validQuizzes = snapshot.docs
+    .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(q => {
+        const dept = q.department ? q.department.toLowerCase() : "";
+        const departmentMatch =
+          dept.includes("all") || q.department === studentDept;
+
+        const start = q.startAt ? q.startAt.toDate() : null;
+        const end = q.endAt ? q.endAt.toDate() : null;
+        const withinDateRange =
+          (!start || now >= start) && (!end || now <= end);
+
+        return departmentMatch && withinDateRange;
     });
 
-    if (!activeQuiz) {
-      quizContainer.innerHTML = '<p>No quiz available for now.</p>';
+
+    if (validQuizzes.length === 0) {
+      quizContainer.innerHTML = '<p>No quizzes available for your department right now.</p>';
       return;
     }
 
-    quizData = activeQuiz.data();
-    quizData.id = activeQuiz.id;
+    // 🔹 Display all valid quizzes
+    quizContainer.innerHTML = `
+      <h3>Available Quizzes</h3>
+      <div id="quizListContainer" class="quiz-list"></div>
+    `;
 
-    // ✅ Check if student already took this quiz
-    const attemptSnap = await studentRef
-      .collection("quizHistory")
-      .where("quizId", "==", quizData.id)
-      .limit(1)
-      .get();
+    const listDiv = document.getElementById('quizListContainer');
 
-    if (!attemptSnap.empty) {
-      const data = attemptSnap.docs[0].data();
-      const percent = ((data.score / data.total) * 100).toFixed(1);
-      const status = percent >= 50 ? "✅ Passed" : "❌ Failed";
+    for (const quiz of validQuizzes) {
+      // Check if student already attempted this quiz
+      const attemptSnap = await studentRef
+        .collection("quizHistory")
+        .where("quizId", "==", quiz.id)
+        .limit(1)
+        .get();
 
-      quizContainer.innerHTML = `
-        <div style="text-align:center;">
-          <h3>You’ve already taken this quiz.</h3>
-          <p><strong>Score:</strong> ${data.score}/${data.total}</p>
-          <p><strong>Status:</strong> <span style="color:${percent >= 50 ? 'green' : 'red'};">${status}</span></p>
-          <p><strong>Date:</strong> ${data.timestamp?.toDate().toLocaleString() || "—"}</p>
-        </div>
+      const alreadyTaken = !attemptSnap.empty;
+
+      const quizCard = document.createElement('div');
+      quizCard.className = 'quiz-card';
+      quizCard.innerHTML = `
+        <h4>${quiz.title}</h4>
+        <p><strong>Department:</strong> ${quiz.department}</p>
+        <p><strong>Duration:</strong> ${quiz.duration} mins</p>
+        <p><strong>Available:</strong> ${
+          quiz.startAt ? quiz.startAt.toDate().toLocaleString() : "Now"
+        } - ${
+          quiz.endAt ? quiz.endAt.toDate().toLocaleString() : "No End Date"
+        }</p>
+        ${
+          alreadyTaken
+            ? `<p style="color:gray;">You have already taken this quiz ✅</p>`
+            : `<button class="buttonx" onclick="startSelectedQuiz('${quiz.id}')">Start Quiz</button>`
+        }
       `;
-      return; // ✅ Stop here, don’t allow taking again
+      listDiv.appendChild(quizCard);
     }
 
-    // Continue if not taken
+  } catch (error) {
+    console.error("Error loading quizzes:", error);
+    quizContainer.innerHTML = `<p>Error loading quizzes. Please refresh.</p>`;
+  }
+}
+
+async function startSelectedQuiz(quizId) {
+  try {
+    const doc = await db.collection('quizzes').doc(quizId).get();
+    if (!doc.exists) {
+      alert("Quiz not found or no longer active.");
+      return;
+    }
+
+    quizData = doc.data();
+    quizData.id = doc.id;
+
+    // Randomize questions and options
     quizData.questions.sort(() => Math.random() - 0.5);
     quizData.questions.forEach(q => q.options.sort(() => Math.random() - 0.5));
+
     current = 0;
     score = 0;
     showQuestion();
     startTimer(quizData.duration * 60);
+
   } catch (error) {
-    console.error("Error loading quiz:", error);
-    quizContainer.innerHTML = `<p>Error loading quiz. Please refresh.</p>`;
+    console.error("Error starting quiz:", error);
+    alert("Error loading quiz. Please try again.");
   }
 }
+
 
 
 // 🧠 Show question
@@ -234,7 +243,7 @@ async function submitQuiz() {
       totalPrevScore += d.score || 0;
     });
 
-    const newTotal = totalPrevScore + score;
+    const newTotal = totalPrevScore + (score / 5);
 
     // Update assignment score
     await studentRef.update({

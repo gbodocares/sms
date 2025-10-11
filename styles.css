@@ -161,3 +161,35 @@ button:hover {
   min-width: 900px; /* ensures it can scroll if table too wide */
 }
 
+.quiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quiz-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.quiz-card h4 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.buttonx {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.buttonx:hover {
+  background: #0056b3;
+}
+
+

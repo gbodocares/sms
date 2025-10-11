@@ -23,10 +23,13 @@
       e.preventDefault();
       try {
         const questions = JSON.parse(document.getElementById('quizQuestions').value);
+        const deptValue = quizForm.quizDept.value.trim();
+        const department = deptValue.toLowerCase().includes("all") ? "All Departments" : deptValue;
+
         await db.collection('quizzes').add({
           title: quizForm.quizTitle.value,
           duration: parseInt(quizForm.quizDuration.value),
-          department: quizForm.quizDept.value,
+          department,
           startAt: quizForm.startAt.value ? new Date(quizForm.startAt.value) : null,
           endAt: quizForm.endAt.value ? new Date(quizForm.endAt.value) : null,
           questions,
