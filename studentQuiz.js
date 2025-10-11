@@ -83,64 +83,87 @@ async function loadActiveQuiz() {
       return;
     }
 
-    // 🔹 Filter all valid quizzes for this student
-    const validQuizzes = snapshot.docs
-    .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(q => {
-        const dept = q.department ? q.department.toLowerCase() : "";
-        const departmentMatch =
-          dept.includes("all") || q.department === studentDept;
+    // 🔹 Separate quizzes by timing
+    const upcomingQuizzes = [];
+    const availableQuizzes = [];
 
-        const start = q.startAt ? q.startAt.toDate() : null;
-        const end = q.endAt ? q.endAt.toDate() : null;
-        const withinDateRange =
-          (!start || now >= start) && (!end || now <= end);
+    snapshot.docs.forEach(doc => {
+      const q = { id: doc.id, ...doc.data() };
+      const dept = q.department ? q.department.toLowerCase() : "";
+      const departmentMatch = dept.includes("all") || q.department === studentDept;
 
-        return departmentMatch && withinDateRange;
+      if (!departmentMatch) return;
+
+      const start = q.startAt ? q.startAt.toDate() : null;
+      const end = q.endAt ? q.endAt.toDate() : null;
+      const isUpcoming = start && now < start;
+      const isAvailable =
+        (!start || now >= start) && (!end || now <= end);
+
+      if (isUpcoming) upcomingQuizzes.push(q);
+      else if (isAvailable) availableQuizzes.push(q);
     });
 
-
-    if (validQuizzes.length === 0) {
-      quizContainer.innerHTML = '<p>No quizzes available for your department right now.</p>';
-      return;
-    }
-
-    // 🔹 Display all valid quizzes
+    // 🔹 Build container sections
     quizContainer.innerHTML = `
       <h3>Available Quizzes</h3>
-      <div id="quizListContainer" class="quiz-list"></div>
+      <div id="availableList" class="quiz-list"></div>
+      <hr>
+      <h3>Upcoming Quizzes</h3>
+      <div id="upcomingList" class="quiz-list"></div>
     `;
 
-    const listDiv = document.getElementById('quizListContainer');
+    const availableList = document.getElementById('availableList');
+    const upcomingList = document.getElementById('upcomingList');
 
-    for (const quiz of validQuizzes) {
-      // Check if student already attempted this quiz
-      const attemptSnap = await studentRef
-        .collection("quizHistory")
-        .where("quizId", "==", quiz.id)
-        .limit(1)
-        .get();
+    // 🟢 Show available quizzes
+    if (availableQuizzes.length === 0) {
+      availableList.innerHTML = `<p>No quizzes available right now.</p>`;
+    } else {
+      for (const quiz of availableQuizzes) {
+        const attemptSnap = await studentRef
+          .collection("quizHistory")
+          .where("quizId", "==", quiz.id)
+          .limit(1)
+          .get();
+        const alreadyTaken = !attemptSnap.empty;
 
-      const alreadyTaken = !attemptSnap.empty;
+        const div = document.createElement('div');
+        div.className = 'quiz-card';
+        div.innerHTML = `
+          <h4>${quiz.title}</h4>
+          <p><strong>Department:</strong> ${quiz.department}</p>
+          <p><strong>Duration:</strong> ${quiz.duration} mins</p>
+          <p><strong>Available:</strong> ${
+            quiz.startAt ? quiz.startAt.toDate().toLocaleString() : "Now"
+          } - ${
+            quiz.endAt ? quiz.endAt.toDate().toLocaleString() : "No End Date"
+          }</p>
+          ${
+            alreadyTaken
+              ? `<p style="color:gray;">You have already taken this quiz ✅</p>`
+              : `<button class="buttonx" onclick="startSelectedQuiz('${quiz.id}')">Start Quiz</button>`
+          }
+        `;
+        availableList.appendChild(div);
+      }
+    }
 
-      const quizCard = document.createElement('div');
-      quizCard.className = 'quiz-card';
-      quizCard.innerHTML = `
-        <h4>${quiz.title}</h4>
-        <p><strong>Department:</strong> ${quiz.department}</p>
-        <p><strong>Duration:</strong> ${quiz.duration} mins</p>
-        <p><strong>Available:</strong> ${
-          quiz.startAt ? quiz.startAt.toDate().toLocaleString() : "Now"
-        } - ${
-          quiz.endAt ? quiz.endAt.toDate().toLocaleString() : "No End Date"
-        }</p>
-        ${
-          alreadyTaken
-            ? `<p style="color:gray;">You have already taken this quiz ✅</p>`
-            : `<button class="buttonx" onclick="startSelectedQuiz('${quiz.id}')">Start Quiz</button>`
-        }
-      `;
-      listDiv.appendChild(quizCard);
+    // 🕒 Show upcoming quizzes
+    if (upcomingQuizzes.length === 0) {
+      upcomingList.innerHTML = `<p>No upcoming quizzes scheduled.</p>`;
+    } else {
+      for (const quiz of upcomingQuizzes) {
+        const div = document.createElement('div');
+        div.className = 'quiz-card upcoming';
+        div.innerHTML = `
+          <h4>${quiz.title}</h4>
+          <p><strong>Department:</strong> ${quiz.department}</p>
+          <p><strong>Starts At:</strong> ${quiz.startAt.toDate().toLocaleString()}</p>
+          <p><em>This quiz will be available soon.</em></p>
+        `;
+        upcomingList.appendChild(div);
+      }
     }
 
   } catch (error) {
@@ -148,6 +171,7 @@ async function loadActiveQuiz() {
     quizContainer.innerHTML = `<p>Error loading quizzes. Please refresh.</p>`;
   }
 }
+
 
 async function startSelectedQuiz(quizId) {
   try {

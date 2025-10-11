@@ -193,3 +193,10 @@ button:hover {
 }
 
 
+.quiz-card.upcoming {
+  opacity: 0.8;
+  border-left: 5px solid orange;
+  background-color: #fff7e6;
+}
+
+
