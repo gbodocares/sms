@@ -143,3 +143,7 @@ button:hover {
   font-weight: bold;
 }
 
+.accordion-button:hover{
+  color: #fff;
+}
+

@@ -12,7 +12,7 @@ const addForm = document.getElementById("addStudentForm");
 const editForm = document.getElementById("editStudentForm");
 const studentList = document.getElementById("studentList");
 const editSection = document.getElementById("editSection");
-const searchInput = document.getElementById("searchInput");
+
 
 // 🔹 New reference for score form
 const adminScoreForm = document.getElementById("adminScoreForm");
@@ -84,66 +84,91 @@ const tableBody = document.getElementById("studentTableBodyEdit");
 const editModal = document.getElementById("editModal");
 const closeModal = document.getElementById("closeModal");
 const saveEditBtn = document.getElementById("saveEditBtn");
+const searchInput = document.getElementById("searchInput");
 
+let allStudents = []; // store all fetched students here
+
+// 🔹 Fetch & listen to Firestore updates
 db.collection("students1").onSnapshot(snapshot => {
-  tableBody.innerHTML = ""; 
-
+  allStudents = []; // reset
   snapshot.forEach(doc => {
-    const data = doc.data();
+    allStudents.push({ id: doc.id, ...doc.data() });
+  });
+});
 
+// 🔹 Render filtered results only when searching
+function renderFilteredStudents(filter) {
+  tableBody.innerHTML = ""; // clear old rows
+
+  const filtered = allStudents.filter(student =>
+    `${student.regNo} ${student.fullName} ${student.department} ${student.groupId}`
+      .toLowerCase()
+      .includes(filter.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    // show no result message
+    const noRow = document.createElement("tr");
+    noRow.innerHTML = `
+      <td colspan="11" style="text-align:center; color:gray; padding:15px;">
+        No results found for "<strong>${filter}</strong>"
+      </td>`;
+    tableBody.appendChild(noRow);
+    return;
+  }
+
+  filtered.forEach(data => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${data.regNo}</td>
-      <td>${data.fullName}</td>
-      <td>${data.email}</td>
-      <td>${data.phone}</td>
-      <td>${data.department}</td>
-      <div>
-         <td style="display: flex;">
-            <button style="background-color: transparent; color: teal" class="editBtn"><i class="bi bi-pencil"></i></button>
-            <button style="background-color: transparent; color: red" class="delBtn"><i class="bi bi-trash3"></i></button>
-        </td>
-      </div>
-     
+      <td style="border:1px solid black !important;">${data.regNo}</td>
+      <td style="border:1px solid black !important;"><img src="${data.photoURL}" alt="student photo" width="50px" height="50px" style="border-radius:6px;"/></td>
+      <td style="border:1px solid black !important;">${data.fullName}</td>
+      <td style="border:1px solid black !important;">${data.department}</td>
+      <td style="border:1px solid black !important;">${data.groupId}</td>
+      <td style="border:1px solid black !important;">${data.attendance}</td>
+      <td style="border:1px solid black !important;">${data.assignment}</td>
+      <td style="border:1px solid black !important;">${data.test}</td>
+      <td style="border:1px solid black !important;">${data.softSkill}</td>
+      <td style="border:1px solid black !important;">${data.finalProject}</td>
+      <td style="border:1px solid black !important;" style="color: teal; font-weight: bold;">${data.totalScore}</td>
+      <td style="display:flex; border:1px solid black !important;">
+        <button style="background-color: transparent; color: teal" class="editBtn"><i class="bi bi-pencil"></i></button>
+        <button style="background-color: transparent; color: red" class="delBtn"><i class="bi bi-trash3"></i></button>
+      </td>
     `;
 
-    // Edit button → open modal
+    // 🔸 Edit button → open modal
     row.querySelector(".editBtn").onclick = () => {
-      document.getElementById("editStudentId").value = doc.id;
+      document.getElementById("editStudentId").value = data.id;
       document.getElementById("editRegNo").value = data.regNo;
       document.getElementById("editFullName").value = data.fullName;
       document.getElementById("editEmail").value = data.email;
       document.getElementById("editPhone").value = data.phone;
       document.getElementById("editDept").value = data.department;
-
-      editModal.style.display = "block"; // show modal
+      editModal.style.display = "block";
     };
 
-    // Delete button
+    // 🔸 Delete button → remove record
     row.querySelector(".delBtn").onclick = () => {
       if (confirm("Are you sure you want to delete this student?")) {
-        db.collection("students1").doc(doc.id).delete();
+        db.collection("students1").doc(data.id).delete();
       }
     };
 
     tableBody.appendChild(row);
   });
+}
 
-   // Run filtering whenever the user types
-  searchInput.addEventListener("keyup", function() {
-    const filter = searchInput.value.toLowerCase();
-    const rows = tableBody.getElementsByTagName("tr");
-
-    Array.from(rows).forEach(row => {
-      const text = row.textContent.toLowerCase();
-      if (text.includes(filter)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
+// 🔹 Search functionality
+searchInput.addEventListener("keyup", function() {
+  const filter = this.value.trim();
+  if (filter.length === 0) {
+    tableBody.innerHTML = ""; // clear table when search input is empty
+  } else {
+    renderFilteredStudents(filter);
+  }
 });
+
 
 // Close modal on X click
 closeModal.onclick = () => {
@@ -261,29 +286,7 @@ adminScoreForm.addEventListener("submit", (e) => {
 
 
 firebase.firestore().collection("students1").onSnapshot(snapshot => {
-  const tableBody = document.getElementById("studentTableBody");
-  tableBody.innerHTML = ""; // Clear existing rows
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${data.regNo || ""}</td>
-      <td><img width="50px" height="50px" src=${data.photoURL || ""} alt="" /></td>
-      <td>${data.fullName || ""}</td>
-      <td>${data.department || ""}</td>
-      <td>${data.groupId || ""}</td>
-      <td>${data.attendance || "0"}</td>
-      <td>${data.test || "0"}</td>
-      <td>${data.assignment || "0"}</td>
-      <td>${data.softSkill || "0"}</td>
-      <td>${data.finalProject || "0"}</td>
-      <td style="font-weight: bold; color: #800020;">${data.totalScore || "0"}</td>
-    `;
-
-    tableBody.appendChild(row);
-  });
+  
 
   // Run filtering whenever the user types
   searchInput.addEventListener("keyup", function() {
@@ -299,6 +302,164 @@ firebase.firestore().collection("students1").onSnapshot(snapshot => {
       }
     });
   });
+
+   // ======================  DEPARTMENT RANKINGS SECTION ======================
+const rankingContainer = document.getElementById("rankingTablesContainer");
+
+// Function to render department tables dynamically
+function renderDepartmentRankings(students) {
+  rankingContainer.innerHTML = ""; // Clear existing
+
+  // Group students by department
+  const departments = {};
+  students.forEach((s) => {
+    const dept = s.department || "Unknown";
+    if (!departments[dept]) departments[dept] = [];
+    departments[dept].push(s);
+  });
+
+  // Generate a table for each department
+  Object.keys(departments).forEach((dept) => {
+    const deptStudents = departments[dept].sort(
+      (a, b) => (b.totalScore || 0) - (a.totalScore || 0)
+    );
+
+    // Create a unique collapse ID for this department
+    const collapseId = `collapse-${dept.replace(/\s+/g, "_").toLowerCase()}`;
+    const headingId = `heading-${dept.replace(/\s+/g, "_").toLowerCase()}`;
+
+    // Create table container
+    const container = document.createElement("div");
+    container.classList.add("accordion", "accordion-flush");
+    container.innerHTML = `
+      <div class="accordion-item" style="margin-bottom: 15px;">
+        <h2 class="accordion-header" id="${headingId}">
+          <button class="accordion-button collapsed" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#${collapseId}"
+            aria-expanded="false"
+            aria-controls="${collapseId}">
+            ${dept.toUpperCase()} Department
+          </button>
+        </h2>
+
+        <div id="${collapseId}" class="accordion-collapse collapse"
+             aria-labelledby="${headingId}">
+          <div class="accordion-body">
+            <div style="margin-bottom: 10px;">
+              <button class="downloadPDFBtn" data-dept="${dept}"
+                style="background:teal; color:white; border:none; padding:6px 12px; margin-right:6px; border-radius:4px;">
+                Download PDF
+              </button>
+              <button class="downloadExcelBtn" data-dept="${dept}"
+                style="background:#800020; color:white; border:none; padding:6px 12px; border-radius:4px;">
+                Download Excel
+              </button>
+            </div>
+
+            <table border="1" cellpadding="8" cellspacing="0" width="100%"
+              style="border-collapse:collapse; text-align:left; margin-top:10px;">
+              <thead style="background-color:#f4f4f4;">
+                <tr>
+                  <th>Rank</th>
+                  <th>Reg No</th>
+                  <th>Full Name</th>
+                  <th>Total Score</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody-${dept.replace(/\s+/g, '_')}">
+                ${deptStudents
+                  .map(
+                    (s, i) => `
+                    <tr>
+                      <td style="border:1px solid black !important;"><strong>${i + 1}</strong></td>
+                      <td style="border:1px solid black !important;">${s.regNo}</td>
+                      <td style="border:1px solid black !important;">${s.fullName}</td>
+                      <td style="font-weight:bold; color:#800020; border:1px solid black !important;">${s.totalScore || 0}</td>
+                    </tr>
+                  `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    rankingContainer.appendChild(container);
+  });
+
+  // Attach export button listeners
+  attachExportListeners(departments);
+}
+
+
+      // ====================== 🔹 EXPORT FUNCTIONS ======================
+
+      // Export handlers
+      function attachExportListeners(departments) {
+        // PDF
+        document.querySelectorAll(".downloadPDFBtn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const dept = btn.getAttribute("data-dept");
+            downloadDeptAsPDF(dept, departments[dept]);
+          });
+        });
+
+        // Excel
+        document.querySelectorAll(".downloadExcelBtn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const dept = btn.getAttribute("data-dept");
+            downloadDeptAsExcel(dept, departments[dept]);
+          });
+        });
+      }
+
+      // PDF export using jsPDF
+      function downloadDeptAsPDF(dept, students) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text(`${dept.toUpperCase()} Department Rankings`, 10, 15);
+
+        const rows = students.map((s, i) => [
+          i + 1,
+          s.regNo || "",
+          s.fullName || "",
+          s.totalScore || 0,
+        ]);
+
+        doc.autoTable({
+          head: [["Rank", "Reg No", "Full Name", "Total Score"]],
+          body: rows,
+          startY: 25,
+        });
+
+        doc.save(`${dept}_Rankings.pdf`);
+      }
+
+      // Excel export using SheetJS
+      function downloadDeptAsExcel(dept, students) {
+        const wb = XLSX.utils.book_new();
+        const data = [["Rank", "Reg No", "Full Name", "Total Score"]];
+
+        students.forEach((s, i) => {
+          data.push([i + 1, s.regNo, s.fullName, s.totalScore || 0]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, "Rankings");
+        XLSX.writeFile(wb, `${dept}_Rankings.xlsx`);
+      }
+
+      // ====================== 🔹 REALTIME DATA FETCH ======================
+      firebase.firestore().collection("students1").onSnapshot((snapshot) => {
+        const allStudents = [];
+        snapshot.forEach((doc) => allStudents.push(doc.data()));
+        renderDepartmentRankings(allStudents);
+      });
+
 });
 
 
