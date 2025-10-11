@@ -179,17 +179,8 @@ button:hover {
   color: #333;
 }
 
-.buttonx {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .buttonx:hover {
-  background: #0056b3;
+  background: rgb(118, 212, 212);
 }
 
 
@@ -197,6 +188,24 @@ button:hover {
   opacity: 0.8;
   border-left: 5px solid orange;
   background-color: #fff7e6;
+}
+
+.buttonx {
+  background: teal;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.buttonx.secondary {
+  background: #ccc;
+  color: #000;
+}
+
+.progress-container {
+  font-family: Arial, sans-serif;
 }
 
 

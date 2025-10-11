@@ -178,6 +178,12 @@
         <label class="labelx">Duration (minutes)</label>
         <input type="number" id="quizDuration" required class="inputx">
       </div>
+
+      <div class="form-groupx">
+        <label>Total Marks:</label>
+        <input type="number" name="quizMarks" id="quizMarks" placeholder="Enter total marks" required><br>
+      </div>
+
       <div class="form-groupx">
         <label class="labelx">Department</label>
         <select id="quizDept" class="selectx">
@@ -202,7 +208,7 @@
         <label class="labelx">Questions (JSON format)</label>
         <textarea id="quizQuestions" rows="5" placeholder='[{"q":"What is 2+2?","options":["2","4","6"],"answer":"4"}]' class="textareax"></textarea>
       </div>
-      <button type="submit" class="buttonx btn-primary">Create Quiz</button>
+      <button type="submit" class="buttonx">Create Quiz</button>
     </form>
 
     <div class="quiz-list" id="quizList"></div>
