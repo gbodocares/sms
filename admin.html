@@ -8,6 +8,19 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="loader.css">
+   <style>
+    .bodyx { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:20px; }
+    .h1x { color:#333; }
+    .container { background:white; padding:20px; border-radius:8px; max-width:900px; margin:auto; }
+    .form-group { margin-bottom:10px; }
+    .labelx { display:block; font-weight:bold; margin-bottom:5px; }
+    .inputx, .selectx, .textareax { width:100%; padding:8px; border:1px solid #ccc; border-radius:5px; }
+    .buttonx { padding:10px 15px; border:none; border-radius:5px; cursor:pointer; }
+    .btn-primary { background:#007bff; color:white; }
+    .btn-danger { background:#dc3545; color:white; }
+    .quiz-list { margin-top:20px; }
+    .quiz-item { background:#f9f9f9; padding:15px; border-radius:5px; margin-bottom:10px; }
+  </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
  
@@ -152,8 +165,47 @@
       <div id="rankingTablesContainer">
         <!-- Department tables will appear here -->
       </div>
+  </section>
 
-    
+  <section class="containerx">
+    <h1 class="h1x">Admin Quiz Manager</h1>
+    <form id="quizForm">
+      <div class="form-groupx">
+        <label class="labelx">Quiz Title</label>
+        <input type="text" id="quizTitle" required class="inputx">
+      </div>
+      <div class="form-groupx">
+        <label class="labelx">Duration (minutes)</label>
+        <input type="number" id="quizDuration" required class="inputx">
+      </div>
+      <div class="form-groupx">
+        <label class="labelx">Department</label>
+        <select id="quizDept" class="selectx">
+          <option value="none">---Select the Department---</option>
+          <option value="general">General</option>
+          <option value="Make-up">Make-up</option>
+          <option value="Tailoring">Tailoring</option>
+          <option value="Nails Decoration">Nails Technology</option>
+          <option value="Web Design">Web Design</option>
+          <option value="Computer Networking">Computer Networking</option>
+          <option value="UI/UX Design">UI/UX Design</option>
+          <option value="Video Editing">Video Editing</option>
+          <option value="Videography">Videography & Photography</option>
+        </select>
+      </div>
+      <div class="form-groupx">
+        <label class="labelx">Availability Period</label>
+        <input type="datetime-local" id="startAt" class="inputx"> 
+        <input type="datetime-local" id="endAt" class="inputx">
+      </div>
+      <div class="form-groupx">
+        <label class="labelx">Questions (JSON format)</label>
+        <textarea id="quizQuestions" rows="5" placeholder='[{"q":"What is 2+2?","options":["2","4","6"],"answer":"4"}]' class="textareax"></textarea>
+      </div>
+      <button type="submit" class="buttonx btn-primary">Create Quiz</button>
+    </form>
+
+    <div class="quiz-list" id="quizList"></div>
   </section>
 
   <div id="loader" class="loader-overlay" style="display:none;">
@@ -178,5 +230,6 @@
 
   <script  src="firebase-config.js"></script>
   <script src="admin.js"></script>
+  <script src="adminQuiz.js"></script>
 </body>
 </html>

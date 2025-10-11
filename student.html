@@ -3,11 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Student Portal</title>
-  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="student.css">
   <link rel="stylesheet" href="loader.css">
- 
+  <style>
+    .bodyx { font-family: Arial, sans-serif; background:#eef2f3; margin:0; padding:20px; }
+    .containerx { background:white; padding:20px; border-radius:8px; max-width:700px; margin:auto; }
+    .h1x { color:#333; }
+    .buttonx { background:#007bff; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; }
+    .question { margin-bottom:15px; }
+    .option { display:block; margin:5px 0; }
+    .timer { float:right; font-weight:bold; }
+  </style>
 </head>
 <body>
 
@@ -23,6 +31,9 @@
   <div class="cont">
     <h1>Student Dashboard</h1>
 
+    
+
+   
   <!-- Profile Section -->
   <section>
     <h2 id="hello" style="color: #800020;"></h2>
@@ -32,12 +43,27 @@
           <p id="totalScore"></p>
        </div>
     </div>
+    <div id="quizWrapper">
+      <div id="quizHeader">
+        <h2>📘 Assignment </h2>
+        <div id="timer">00:00</div>
+      </div>
+
+      <div id="quizContainer" class="quiz-box">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Fetching Assignment...</p>
+        </div>
+      </div>
+    </div>
+
+    
    
     <div class="softSkillDetails" >
       <h3 id="groupName"></h3>
       <h3 id="ssClassName"></h3>
     </div>
-    
+
     
     <form id="profileForm">
       <input type="text" id="profileRegNo" placeholder="Registration No" required disabled>
@@ -58,6 +84,27 @@
       <button type="submit">Update Profile</button>
     </form>
   </section>
+
+  <div id="quizHistorySection" style="margin-top:30px;">
+        <h3>📊 Quiz History</h3>
+        <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
+          <thead style="background-color: #f3f3f3;">
+            <tr>
+              <th>Quiz Title</th>
+              <th>Score</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date Taken</th>
+            </tr>
+          </thead>
+          <tbody id="quizHistoryBody">
+            <tr><td colspan="5">Loading your quiz history...</td></tr>
+          </tbody>
+        </table>
+    </div>
+    
+    <br>
+    <br>
 
   <!-- Scores Section -->
   <section>
@@ -136,8 +183,6 @@
 </div>
   </div>
   
-
-
   <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
@@ -145,6 +190,7 @@
 
   <script  src="firebase-config.js"></script>
   <script  src="student.js"></script>
+  <script  src="studentQuiz.js"></script>
   <script>
     firebase.auth().onAuthStateChanged(user => {
   if (user) {
