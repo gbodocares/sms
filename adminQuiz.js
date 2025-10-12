@@ -20,11 +20,37 @@ async function loadQuizzes() {
         ${quiz.active ? 'Deactivate' : 'Activate'}
       </button>
       <button style="background-color: teal;" onclick="editQuiz('${doc.id}')">Edit</button>
+      <button 
+        style="background-color: goldenrod;" 
+        onclick="handleResultsAccess('${doc.id}', '${quiz.title}', ${quiz.endAt ? quiz.endAt.seconds : 'null'})"
+      >
+        View Results
+      </button>
+
       <button class="btn-danger" onclick="deleteQuiz('${doc.id}')">Delete</button>
     `;
     quizList.appendChild(div);
   });
 }
+
+function handleResultsAccess(quizId, title, endAtSeconds) {
+  const now = new Date();
+  const quizEnd = endAtSeconds ? new Date(endAtSeconds * 1000) : null;
+
+  // If no end date is set, allow view (useful for manual tests)
+  if (!quizEnd) return viewResults(quizId, title);
+
+  // Check if the quiz has ended
+  if (now < quizEnd) {
+    const remaining = Math.ceil((quizEnd - now) / (1000 * 60));
+    alert(`⏳ This quiz is still active.\nResults will be available after it ends in approximately ${remaining} minutes.`);
+    return;
+  }
+
+  // Allow view after end time
+  viewResults(quizId, title);
+}
+
 
 // ✅ Handle form submission (create or update)
 quizForm.onsubmit = async (e) => {
@@ -149,3 +175,98 @@ function cancelEditMode() {
 }
 
 loadQuizzes();
+
+async function viewResults(quizId, title) {
+  const modal = document.getElementById('quizResultsModal');
+  const resultsBody = document.getElementById('quizResultsBody');
+  const resultsQuizTitle = document.getElementById('resultsQuizTitle');
+
+  modal.style.display = 'flex';
+  resultsQuizTitle.textContent = title;
+  resultsBody.innerHTML = '<tr><td colspan="5">Loading results...</td></tr>';
+
+  try {
+    const snapshot = await db.collection('quizAttempts')
+      .where('quizId', '==', quizId)
+      .orderBy('submittedAt', 'desc')
+      .get();
+
+    if (snapshot.empty) {
+      resultsBody.innerHTML = '<tr><td colspan="5">No submissions yet.</td></tr>';
+      return;
+    }
+
+    let rowsHTML = '';
+    const resultsArray = [];
+
+   const uniqueResults = {}; // store only one result per student
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const regNo = (data.studentRegNo || '').trim().toUpperCase();
+
+    if (!regNo) return; // skip invalid entries
+
+    // If already seen this student, keep only the most recent
+    const existing = uniqueResults[regNo];
+    const currentTime = data.submittedAt?.toDate().getTime() || 0;
+    const existingTime = existing?.submittedAt?.toDate().getTime() || 0;
+
+    if (!existing || currentTime > existingTime) {
+      uniqueResults[regNo] = data; // keep latest record
+    }
+  });
+
+  // Now render only unique students
+  Object.values(uniqueResults).forEach(data => {
+    const date = data.submittedAt?.toDate().toLocaleString() || '—';
+    rowsHTML += `
+      <tr>
+        <td>${data.studentName || '—'}</td>
+        <td>${data.studentRegNo || '—'}</td>
+        <td>${data.marksEarned}</td>
+        <td>${data.totalMarks}</td>
+        <td>${date}</td>
+      </tr>
+    `;
+
+    resultsArray.push({
+      Student: data.studentName || '—',
+      RegNo: data.studentRegNo || '—',
+      Score: data.marksEarned,
+      Total: data.totalMarks,
+      DateSubmitted: date
+    });
+  });
+
+
+    resultsBody.innerHTML = rowsHTML;
+
+    // Attach export functionality
+    document.getElementById('exportCSVBtn').onclick = () => exportToCSV(title, resultsArray);
+
+  } catch (err) {
+    console.error(err);
+    resultsBody.innerHTML = '<tr><td colspan="5">Error loading results!</td></tr>';
+  }
+}
+
+
+function closeResultsModal() {
+  document.getElementById('quizResultsModal').style.display = 'none';
+}
+
+function exportToCSV(quizTitle, data) {
+  if (!data.length) return alert("No data to export!");
+
+  const headers = Object.keys(data[0]).join(",");
+  const rows = data.map(obj => Object.values(obj).join(","));
+  const csvContent = [headers, ...rows].join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${quizTitle.replace(/\s+/g, "_")}_Results.csv`;
+  link.click();
+}
+

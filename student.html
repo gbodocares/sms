@@ -86,24 +86,31 @@
   </section>
 
   <div id="quizHistorySection" style="margin-top:30px;">
-        <h3>📊 Assignment History</h3>
-        <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
-          <thead style="background-color: #f3f3f3;">
-            <tr>
-              <th>Quiz Title</th>
-              <th>Scored</th>
-              <th>Out Of</th>
-              <th>Date Taken</th>
-            </tr>
-          </thead>
-          <tbody id="quizHistoryBody">
-            <tr><td colspan="5">Loading your quiz history...</td></tr>
-          </tbody>
-        </table>
-    </div>
+  <h3>📊 Assignment History</h3>
+  <div style="max-height: 320px; overflow-y: auto;" id="quizHistoryWrapper">
+    <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
+      <thead style="background-color: #f3f3f3;">
+        <tr>
+          <th>Quiz Title</th>
+          <th>Scored</th>
+          <th>Out Of</th>
+          <th>Date Taken</th>
+        </tr>
+      </thead>
+      <tbody id="quizHistoryBody">
+        <tr><td colspan="5">Loading your quiz history...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="text-align:center; margin-top:10px;">
+    <button id="toggleHistoryBtn" class="buttonx" style="display:none;">Show More</button>
+  </div>
+</div>
+
     
-    <br>
-    <br>
+  <br>
+  <br>
 
   <!-- Scores Section -->
   <section>
