@@ -696,31 +696,80 @@ async function loadActiveQuiz() {
 // --- Start selected quiz ---
 async function startSelectedQuiz(quizId) {
   try {
+    // ✅ Get student info
+    const studentRegNo = (localStorage.getItem('studentRegNo') || '').trim().toUpperCase();
+    if (!studentRegNo) {
+      alert("⚠️ You are not logged in properly.");
+      return;
+    }
+
+    // ✅ Check if the student has already taken this quiz
+    const attemptsSnapshot = await db.collection('quizAttempts')
+      .where('quizId', '==', quizId)
+      .where('studentRegNo', '==', studentRegNo)
+      .get();
+
+    if (!attemptsSnapshot.empty) {
+      alert("⚠️ You have already taken this quiz. Retakes are not allowed.");
+      return; // Stop the quiz from starting
+    }
+
+    // ✅ Get quiz data
     const doc = await db.collection('quizzes').doc(quizId).get();
     if (!doc.exists) {
       alert("Quiz not found or no longer active.");
       return;
     }
 
-    quizData = doc.data();
-    quizData.id = doc.id;
+    const quizDataRaw = doc.data();
+    quizData = { ...quizDataRaw, id: doc.id };
 
     quizData.marks = quizData.marks || quizData.questions.length;
     quizData.markPerQuestion = quizData.marks / quizData.questions.length;
 
-    // Randomize questions & options
+    // ✅ Randomize questions & options
     quizData.questions.sort(() => Math.random() - 0.5);
     quizData.questions.forEach(q => q.options.sort(() => Math.random() - 0.5));
 
+    // ✅ Initialize quiz session
     current = 0;
     score = 0;
     showQuestion();
     startTimer(quizData.duration * 60);
+
   } catch (error) {
     console.error("Error starting quiz:", error);
     alert("Error loading quiz. Please try again.");
   }
 }
+
+// async function startSelectedQuiz(quizId) {
+//   try {
+//     const doc = await db.collection('quizzes').doc(quizId).get();
+//     if (!doc.exists) {
+//       alert("Quiz not found or no longer active.");
+//       return;
+//     }
+
+//     quizData = doc.data();
+//     quizData.id = doc.id;
+
+//     quizData.marks = quizData.marks || quizData.questions.length;
+//     quizData.markPerQuestion = quizData.marks / quizData.questions.length;
+
+//     // Randomize questions & options
+//     quizData.questions.sort(() => Math.random() - 0.5);
+//     quizData.questions.forEach(q => q.options.sort(() => Math.random() - 0.5));
+
+//     current = 0;
+//     score = 0;
+//     showQuestion();
+//     startTimer(quizData.duration * 60);
+//   } catch (error) {
+//     console.error("Error starting quiz:", error);
+//     alert("Error loading quiz. Please try again.");
+//   }
+// }
 
 // --- Quiz navigation ---
 function showQuestion() {
