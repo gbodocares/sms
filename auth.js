@@ -132,7 +132,7 @@ registerForm.addEventListener("submit", async (e) => {
     let assignedGroup = null;
     for (let g of shuffledGroups) {
       const snap = await firebase.firestore().collection("students1").where("groupId", "==", g).get();
-      if (snap.size < 15) {
+      if (snap.size < 17) {
         assignedGroup = g;
         break;
       }
