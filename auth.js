@@ -117,7 +117,7 @@ registerForm.addEventListener("submit", async (e) => {
         .where("classId", "==", c)
         .get();
 
-      if (snap.size < 40) {
+      if (snap.size < 50) {
         assignedClass = c;
         break;
       }
@@ -128,40 +128,96 @@ registerForm.addEventListener("submit", async (e) => {
     }
 
     // Shuffle and assign group
+    // const shuffledGroups = shuffle([...groups]);
+    // let assignedGroup = null;
+    // for (let g of shuffledGroups) {
+    //   const snap = await firebase.firestore().collection("students1").where("groupId", "==", g).get();
+    //   // const snap = await firebase.firestore().collection("students1").where("groupId", "==", g.trim()).get();
+    //   if (snap.size < 15) {
+    //     assignedGroup = g;
+    //     break;
+    //   }
+    // }
+
+    // console.log("Assigned group:", assignedGroup);
+
+    // if (!assignedGroup) {
+    //   alert("All soft skill groups are full! Cannot assign student.");
+    //   return;
+    // }
+
+    // // Save student data with assigned group
+    // await firebase.firestore().collection("students1").doc(cred.user.uid).set({
+    //   regNo: regNo,
+    //   fullName: fullName,
+    //   email: email,
+    //   department: dept,
+    //   groupId: assignedGroup,
+    //   classId: assignedClass,
+    //   phone: phone,
+    //   photoURL: photoURL,
+    //   createdAt: new Date(),
+
+    //   test: 0,
+    //   assignment: 0,
+    //   softSkill: 0,
+    //   finalProject: 0,
+    //   attendance: 0,
+    //   totalScore: 0
+    // });
+
+    console.log("📗 Assigning group...");
     const shuffledGroups = shuffle([...groups]);
     let assignedGroup = null;
-    for (let g of shuffledGroups) {
-      const snap = await firebase.firestore().collection("students1").where("groupId", "==", g).get();
-      if (snap.size < 17) {
-        assignedGroup = g;
-        break;
-      }
-    }
 
-    if (!assignedGroup) {
-      alert("All soft skill groups are full! Cannot assign student.");
+    if (!shuffledGroups || shuffledGroups.length === 0) {
+      alert("⚠️ Group list is empty. Please contact the admin.");
+      console.error("❌ groups array is empty.");
       return;
     }
 
-    // Save student data with assigned group
-    await firebase.firestore().collection("students1").doc(cred.user.uid).set({
-      regNo: regNo,
-      fullName: fullName,
-      email: email,
-      department: dept,
-      groupId: assignedGroup,
-      classId: assignedClass,
-      phone: phone,
-      photoURL: photoURL,
-      createdAt: new Date(),
+  for (let g of shuffledGroups) {
+    const groupSnap = await firebase.firestore()
+      .collection("students1")
+      .where("groupId", "==", g)
+      .get();
 
-      test: 0,
-      assignment: 0,
-      softSkill: 0,
-      finalProject: 0,
-      attendance: 0,
-      totalScore: 0
-    });
+    console.log(`Group ${g} has ${groupSnap.size} students`);
+
+    if (groupSnap.size < 15) {
+      assignedGroup = g;
+      console.log(`✅ Assigned group: ${assignedGroup}`);
+      break;
+    }
+  }
+
+  // 🔹 If all groups are full or query failed
+  if (!assignedGroup) {
+    alert("⚠️ All soft skill groups are full! Cannot assign you to a group.");
+    console.warn("❌ No available group found with fewer than 20 students.");
+    return;
+  }
+
+  // ✅ Proceed to save student data
+  await firebase.firestore().collection("students1").doc(cred.user.uid).set({
+    regNo: regNo,
+    fullName: fullName,
+    email: email,
+    department: dept,
+    groupId: assignedGroup,
+    classId: assignedClass,
+    phone: phone,
+    photoURL: photoURL,
+    createdAt: new Date(),
+
+    test: 0,
+    assignment: 0,
+    softSkill: 0,
+    finalProject: 0,
+    attendance: 0,
+    totalScore: 0
+  });
+
 
     alert(`Successfully registered and assigned to the soft skill group and class: Group ${assignedGroup} and ${assignedClass}`);
     window.location.href = "student.html";
