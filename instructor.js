@@ -202,8 +202,8 @@ document.getElementById("scores-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const regNo = document.getElementById("studentRegNo").value.trim();
-  const testScore = Number(document.getElementById("testScore").value) || 0;
-  const assignmentScore = Number(document.getElementById("assignmentScore").value) || 0;
+  const testScore =  parseFloat(document.getElementById("testScore").value) || 0;
+  const assignmentScore =  parseFloat(document.getElementById("assignmentScore").value) || 0;
 
   if (!regNo) return alert("Reg No is required");
 
